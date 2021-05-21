@@ -1,301 +1,113 @@
-/*  ---------------------------------------------------
-    Template Name: Amin
-    Description:  Amin magazine HTML Template
-    Author: Colorlib
-    Author URI: https://colorlib.com
-    Version: 1.0
-    Created: Colorlib
----------------------------------------------------------  */
+jQuery(function($) {'use strict';
 
-'use strict';
+	//Responsive Nav
+	$('li.dropdown').find('.fa-angle-down').each(function(){
+		$(this).on('click', function(){
+			if( $(window).width() < 768 ) {
+				$(this).parent().next().slideToggle();
+			}
+			return false;
+		});
+	});
 
-(function ($) {
+	//Fit Vids
+	if( $('#video-container').length ) {
+		$("#video-container").fitVids();
+	}
 
-    /*------------------
-        Preloader
-    --------------------*/
-    $(window).on('load', function () {
-        $(".loader").fadeOut();
-        $("#preloder").delay(200).fadeOut("slow");
-    });
+	//Initiat WOW JS
+	new WOW().init();
 
-    /*------------------
-        Background Set
-    --------------------*/
-    $('.set-bg').each(function () {
-        var bg = $(this).data('setbg');
-        $(this).css('background-image', 'url(' + bg + ')');
-    });
+	// portfolio filter
+	$(window).load(function(){
 
-    // Humberger Menu
-    $(".humberger-open").on('click', function () {
-        $(".humberger-menu-wrapper").addClass("show-humberger-menu");
-        $(".humberger-menu-overlay").addClass("active");
-        $(".nav-options").addClass("humberger-change");
-    });
+		$('.main-slider').addClass('animate-in');
+		$('.preloader').remove();
+		//End Preloader
 
-    $(".humberger-menu-overlay").on('click', function () {
-        $(".humberger-menu-wrapper").removeClass("show-humberger-menu");
-        $(".humberger-menu-overlay").removeClass("active");
-        $(".nav-options").removeClass("humberger-change");
-    });
+		if( $('.masonery_area').length ) {
+			$('.masonery_area').masonry();//Masonry
+		}
 
-    // Search model
-    $('.search-switch').on('click', function () {
-        $('.search-model').fadeIn(400);
-    });
+		var $portfolio_selectors = $('.portfolio-filter >li>a');
+		
+		if($portfolio_selectors.length) {
+			
+			var $portfolio = $('.portfolio-items');
+			$portfolio.isotope({
+				itemSelector : '.portfolio-item',
+				layoutMode : 'fitRows'
+			});
+			
+			$portfolio_selectors.on('click', function(){
+				$portfolio_selectors.removeClass('active');
+				$(this).addClass('active');
+				var selector = $(this).attr('data-filter');
+				$portfolio.isotope({ filter: selector });
+				return false;
+			});
+		}
 
-    $('.search-close-switch').on('click', function () {
-        $('.search-model').fadeOut(400, function () {
-            $('#search-input').val('');
-        });
-    });
+	});
 
-    // Sign Up Form
-    $('.signup-switch').on('click', function () {
-        $('.signup-section').fadeIn(400);
-    });
 
-    $('.signup-close').on('click', function () {
-        $('.signup-section').fadeOut(400);
-    });
+	$('.timer').each(count);
+	function count(options) {
+		var $this = $(this);
+		options = $.extend({}, options || {}, $this.data('countToOptions') || {});
+		$this.countTo(options);
+	}
+		
+	// Search
+	$('.fa-search').on('click', function() {
+		$('.field-toggle').fadeToggle(200);
+	});
 
-    /*------------------
-		Navigation
-	--------------------*/
-    $(".mobile-menu").slicknav({
-        prependTo: '#mobile-menu-wrap',
-        allowParentLinks: true
-    });
+	// Contact form
+	var form = $('#main-contact-form');
+	form.submit(function(event){
+		event.preventDefault();
+		var form_status = $('<div class="form_status"></div>');
+		$.ajax({
+			url: $(this).attr('action'),
+			beforeSend: function(){
+				form.prepend( form_status.html('<p><i class="fa fa-spinner fa-spin"></i> Email is sending...</p>').fadeIn() );
+			}
+		}).done(function(data){
+			form_status.html('<p class="text-success">Thank you for contact us. As early as possible  we will contact you</p>').delay(3000).fadeOut();
+		});
+	});
 
-    /*------------------
-        Hero Slider
-    --------------------*/
-    var hero_s = $(".hero-slider");
-    hero_s.owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: true,
-        animateOut: 'fadeOut',
-        animateIn: 'fadeIn',
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: false
-    });
+	// Progress Bar
+	$.each($('div.progress-bar'),function(){
+		$(this).css('width', $(this).attr('data-transition')+'%');
+	});
 
-    /*------------------
-        Trending Slider
-    --------------------*/
-    $(".trending-slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: false,
-        nav: true,
-        navText: ['<span class="arrow_carrot-left"></span>', '<span class="arrow_carrot-right"></span>'],
-        dotsEach: 2,
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: true
-    });
+	if( $('#gmap').length ) {
+		var map;
 
-    /*------------------------
-        Latest Review Slider
-    --------------------------*/
-    $(".lp-slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 4,
-        dots: true,
-        nav: true,
-        navText: ['<span class="arrow_carrot-left"></span>', '<span class="arrow_carrot-right"></span>'],
-        smartSpeed: 1200,
-        autoHeight: false,
-        dotsEach: 2,
-        autoplay: true,
-        responsive: {
-            320: {
-                items: 1
-            },
-            480: {
-                items: 2
-            },
-            768: {
-                items: 3
-            },
-            992: {
-                items: 4
-            }
-        }
-    });
+		map = new GMaps({
+			el: '#gmap',
+			lat: 43.04446,
+			lng: -76.130791,
+			scrollwheel:false,
+			zoom: 16,
+			zoomControl : false,
+			panControl : false,
+			streetViewControl : false,
+			mapTypeControl: false,
+			overviewMapControl: false,
+			clickable: false
+		});
 
-    /*------------------------
-        Update News Slider
-    --------------------------*/
-    $(".un-slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: false,
-        nav: true,
-        navText: ['<span class="arrow_carrot-left"></span>', '<span class="arrow_carrot-right"></span>'],
-        smartSpeed: 1200,
-        autoHeight: false,
-        dotsEach: 2,
-        autoplay: true
-    });
+		map.addMarker({
+			lat: 43.04446,
+			lng: -76.130791,
+			animation: google.maps.Animation.DROP,
+			verticalAlign: 'bottom',
+			horizontalAlign: 'center',
+			backgroundColor: '#3e8bff',
+		});
+	}
 
-    /*------------------------
-        Video Guide Slider
-    --------------------------*/
-    $(".vg-slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: false,
-        nav: true,
-        navText: ['<span class="arrow_carrot-left"></span>', '<span class="arrow_carrot-right"></span>'],
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: true
-    });
-
-    /*------------------------
-        Gallery Slider
-    --------------------------*/
-    $(".dg-slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: false,
-        nav: true,
-        navText: ['<span class="arrow_carrot-left"></span>', '<span class="arrow_carrot-right"></span>'],
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: true
-    });
-
-    /*------------------
-        Video Popup
-    --------------------*/
-    $('.video-popup').magnificPopup({
-        type: 'iframe'
-    });
-
-    /*------------------
-        Barfiller
-    --------------------*/
-    $('#bar-1').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-    $('#bar-2').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-    $('#bar-3').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-    $('#bar-4').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-    $('#bar-5').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-    $('#bar-6').barfiller({
-        barColor: '#ffffff',
-        duration: 2000
-    });
-
-    /*------------------
-        Circle Progress
-    --------------------*/
-    $('.circle-progress').each(function () {
-        var cpvalue = $(this).data("cpvalue");
-        var cpcolor = $(this).data("cpcolor");
-        var cpid = $(this).data("cpid");
-
-        $(this).append('<div class="' + cpid + '"></div><div class="progress-value"></div>');
-
-        if (cpvalue < 100) {
-
-            $('.' + cpid).circleProgress({
-                value: '0.' + cpvalue,
-                size: 40,
-                thickness: 2,
-                startAngle: -190,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        } else {
-            $('.' + cpid).circleProgress({
-                value: 1,
-                size: 40,
-                thickness: 5,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        }
-    });
-
-    $('.circle-progress-1').each(function () {
-        var cpvalue = $(this).data("cpvalue");
-        var cpcolor = $(this).data("cpcolor");
-        var cpid = $(this).data("cpid");
-
-        $(this).append('<div class="' + cpid + '"></div><div class="progress-value"></div>');
-
-        if (cpvalue < 100) {
-
-            $('.' + cpid).circleProgress({
-                value: '0.' + cpvalue,
-                size: 60,
-                thickness: 2,
-                startAngle: -190,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        } else {
-            $('.' + cpid).circleProgress({
-                value: 1,
-                size: 60,
-                thickness: 5,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        }
-    });
-
-    $('.circle-progress-2').each(function () {
-        var cpvalue = $(this).data("cpvalue");
-        var cpcolor = $(this).data("cpcolor");
-        var cpid = $(this).data("cpid");
-
-        $(this).append('<div class="' + cpid + '"></div><div class="progress-value"></div>');
-
-        if (cpvalue < 100) {
-
-            $('.' + cpid).circleProgress({
-                value: '0.' + cpvalue,
-                size: 200,
-                thickness: 5,
-                startAngle: -190,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        } else {
-            $('.' + cpid).circleProgress({
-                value: 1,
-                size: 200,
-                thickness: 5,
-                fill: cpcolor,
-                emptyFill: "rgba(0, 0, 0, 0)"
-            });
-        }
-    });
-
-})(jQuery);
+});
